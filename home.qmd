@@ -1,0 +1,12 @@
+---
+title: "Home"
+format: html
+---
+
+
+
+<script>
+window.location.href = "https://silentstorm2k.github.io/";
+</script>
+
+<p>Redirecting to Home page...</p>
