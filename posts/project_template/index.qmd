@@ -1,0 +1,49 @@
+---
+title: "Project Title"
+author: "Shivvanandh Mohan"
+date: "10-04-2025"
+format: html
+draft: true
+---
+
+# Problem Statement
+Briefly describe:
+- The task you are solving
+- Why it matters
+- What you aim to demonstrate
+
+# Model Overview
+- Model name and version
+- Key architecture details
+- Notable innovations or reasons for choosing it
+- Link to official paper or repository
+
+# Dataset Details
+- Name and source of dataset
+- Size and structure
+- Preprocessing steps
+- Any limitations
+
+# Live Demo
+You can try the model here:  
+
+<iframe src="" width="100%" height="700" frameborder="0"></iframe>
+
+# Results
+- Metrics achieved (accuracy, F1, BLEU, etc.)
+- Comparisons to baseline if available
+- Example outputs
+
+## Screenshots
+![]()
+![]()
+
+# Key Learnings
+- Insights gained from implementation
+- Challenges faced and how you solved them
+- Next steps or possible improvements
+
+# References
+1. Author(s), *Paper Title*, Conference/Journal, Year. [Link](https://...)
+2. Dataset source [Link](https://...)
+3. Official model repo [Link](https://...)

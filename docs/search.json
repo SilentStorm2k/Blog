@@ -7,17 +7,52 @@
     "text": "Redirecting to Home page…"
   },
   {
-    "objectID": "index.html",
-    "href": "index.html",
-    "title": "Blog",
-    "section": "",
-    "text": "Welcome To My Blog\n\n\n\n\n\n\nnews\n\n\n\n\n\n\n\n\n\nMar 1, 2025\n\n\nShivvanandh Mohan\n\n\n\n\n\n\nNo matching items"
-  },
-  {
     "objectID": "posts/welcome/index.html",
     "href": "posts/welcome/index.html",
     "title": "Welcome To My Blog",
     "section": "",
     "text": "This is the first post in this blog, with many more to follow. Welcome!"
+  },
+  {
+    "objectID": "index.html",
+    "href": "index.html",
+    "title": "Blog",
+    "section": "",
+    "text": "Kuri Origins\n\n\n\n\n\n\nKuri\n\n\n\n\n\n\n\n\n\nOct 4, 2025\n\n\nShivvanandh Mohan\n\n\n\n\n\n\n\n\n\n\n\n\nWelcome To My Blog\n\n\n\n\n\n\nnews\n\n\n\n\n\n\n\n\n\nMar 1, 2025\n\n\nShivvanandh Mohan\n\n\n\n\n\n\nNo matching items"
+  },
+  {
+    "objectID": "posts/kuri_1/index.html",
+    "href": "posts/kuri_1/index.html",
+    "title": "Kuri Origins",
+    "section": "",
+    "text": "I love playing badminton. However, I’m not very good at it, and I really want to improve. I’ve been playing regularly with a friend, watching tons of YouTube tutorials on technique and strategy. But putting those lessons into practice during an actual game is difficult without real-time guidance or feedback.\nThat’s when I thought about building Kuri.\nEven when I played casually, I often wished there was a free and accessible tool that could track scores, act as a line judge for close calls, and provide post-game analysis and insights.\nI’m aware that similar solutions might already exist, but I see this as a learning opportunity to explore multiple areas at once:\n\nBuilding a mobile application\nWorking with computer vision\nLearning to document my progress and write about what I build\nHaving fun while learning something new\n\nSince this is a fairly ambitious project, I’ve broken it down into smaller, self-contained steps. Each component should be valuable on its own, but together they’ll form a complete, end-to-end system."
+  },
+  {
+    "objectID": "posts/kuri_1/index.html#identification",
+    "href": "posts/kuri_1/index.html#identification",
+    "title": "Kuri Origins",
+    "section": "1. Identification",
+    "text": "1. Identification\n\nDetect the shuttlecock in video frames\nTrack player positions and movement\nDetect and mark court boundaries"
+  },
+  {
+    "objectID": "posts/kuri_1/index.html#assessment",
+    "href": "posts/kuri_1/index.html#assessment",
+    "title": "Kuri Origins",
+    "section": "2. Assessment",
+    "text": "2. Assessment\n\nDetect when and where the shuttle hits the ground\nDetermine if the shuttle landed in or out of bounds\nTrack shuttle trajectory (similar to Hawk-Eye)"
+  },
+  {
+    "objectID": "posts/kuri_1/index.html#video-analysis",
+    "href": "posts/kuri_1/index.html#video-analysis",
+    "title": "Kuri Origins",
+    "section": "3. Video analysis",
+    "text": "3. Video analysis\n\nShot Isolation: Identify the exact frames when a player makes contact with the shuttle\nPoint Isolation: Segment full rallies — from serve to point completion"
+  },
+  {
+    "objectID": "posts/kuri_1/index.html#feedback",
+    "href": "posts/kuri_1/index.html#feedback",
+    "title": "Kuri Origins",
+    "section": "4. Feedback",
+    "text": "4. Feedback\n\nProvide coaching assistance using pose estimation models (e.g., PoseNet, MoveNet, or OpenPose)\nOffer tactical insights such as identifying open spaces or poor court positioning\nHighlight performance trends, e.g., if backhand clears consistently fall short of the baseline\nGenerate detailed analysis reports that a coach could use for personalized training plans"
   }
 ]

@@ -1,0 +1,57 @@
+---
+title: "Kuri Origins"
+author: "Shivvanandh Mohan"
+date: "10-04-2025"
+format: html
+categories: [Kuri]
+---
+
+# Problem Statement
+
+I love playing badminton. However, I’m not very good at it, and I really want to improve. I’ve been playing regularly with a friend, watching tons of YouTube tutorials on technique and strategy. But putting those lessons into practice during an actual game is difficult without real-time guidance or feedback.
+
+That’s when I thought about building **Kuri**.
+
+Even when I played casually, I often wished there was a **free and accessible tool** that could track scores, act as a line judge for close calls, and provide **post-game analysis** and insights.
+
+I’m aware that similar solutions might already exist, but I see this as a learning opportunity to explore multiple areas at once:
+
+- Building a **mobile application**
+- Working with **computer vision**
+- Learning to document my progress and write about what I build
+- Having fun while learning something new
+
+Since this is a fairly ambitious project, I’ve broken it down into smaller, self-contained steps. Each component should be valuable on its own, but together they’ll form a complete, end-to-end system.
+
+# The Plan
+
+## 1. Identification
+
+- Detect the shuttlecock in video frames 
+- Track player positions and movement 
+- Detect and mark court boundaries 
+
+## 2. Assessment
+
+- Detect when and where the shuttle hits the ground
+- Determine if the shuttle landed in or out of bounds
+- Track shuttle trajectory (similar to Hawk-Eye)
+
+## 3. Video analysis
+
+- **Shot Isolation**: Identify the exact frames when a player makes contact with the shuttle
+- **Point Isolation**: Segment full rallies — from serve to point completion
+
+## 4. Feedback
+
+- Provide **coaching assistance** using pose estimation models (e.g., PoseNet, MoveNet, or OpenPose)
+- Offer **tactical insights** such as identifying open spaces or poor court positioning
+- Highlight **performance trends**, e.g., if backhand clears consistently fall short of the baseline
+- Generate **detailed analysis reports** that a coach could use for personalized training plans
+
+
+# Final Thoughts
+
+I’m fully aware that this app will likely never be profitable,  especially at the club or amateur level. However, that’s not the goal, I’m building **Kuri** purely out of curiosity and passion for learning.
+
+If this project or post helps or inspires you in any way, I’d really appreciate your [support](https://paypal.me/ShivvanandhMohan?country.x=US&locale.x=en_US). 😊
