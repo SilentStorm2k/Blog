@@ -14,11 +14,81 @@
     "text": "This is the first post in this blog, with many more to follow. Welcome!"
   },
   {
+    "objectID": "posts/kuri_2/index.html",
+    "href": "posts/kuri_2/index.html",
+    "title": "Better Auth with React Native",
+    "section": "",
+    "text": "This post documents how to use BetterAuth inside an Expo app. I cover the high-level steps, configuration snippets, migration pitfalls I ran into (Drizzle, Expo, local testing), and the fixes that worked for me."
+  },
+  {
+    "objectID": "posts/kuri_2/index.html#follow-the-betterauth-expo-integration-docs",
+    "href": "posts/kuri_2/index.html#follow-the-betterauth-expo-integration-docs",
+    "title": "Better Auth with React Native",
+    "section": "1. Follow the BetterAuth + Expo integration docs",
+    "text": "1. Follow the BetterAuth + Expo integration docs\nI mainly followed the Expo Integration guide and the BetterAuth installation guide. The integration uses Expo Router API routes so the backend can be served from inside the Expo project.\nAPI route file: place your server route at app/[...auth]+api.ts (or whatever route you choose) so the Expo Router can host your BetterAuth instance locally."
+  },
+  {
+    "objectID": "posts/kuri_2/index.html#app.json-config",
+    "href": "posts/kuri_2/index.html#app.json-config",
+    "title": "Better Auth with React Native",
+    "section": "2. app.json config",
+    "text": "2. app.json config\nEnsure the web output is set to server so API routes work correctly in the built app:\n\n\napp.json\n\n{\n    \"expo\": {\n        ...\n        \"web\": {\n            \"output\": \"server\",\n        },\n    }\n}"
+  },
+  {
+    "objectID": "posts/kuri_2/index.html#metro-bundler",
+    "href": "posts/kuri_2/index.html#metro-bundler",
+    "title": "Better Auth with React Native",
+    "section": "3. Metro bundler",
+    "text": "3. Metro bundler\nCreate a metro.config.js per the BetterAuth guide (see their step about bundler configuration). This helps Metro resolve worker code and native modules the integration expects."
+  },
+  {
+    "objectID": "posts/kuri_2/index.html#drizzle-config",
+    "href": "posts/kuri_2/index.html#drizzle-config",
+    "title": "Better Auth with React Native",
+    "section": "4. Drizzle config",
+    "text": "4. Drizzle config\nCreate a drizzle.config.ts suited to your folders (adjust out and schema to your repo layout):\n\n\ndrizzle.config.ts\n\nimport { defineConfig } from 'drizzle-kit';\n\nexport default defineConfig({\n    out: './drizzle/migrations',\n    schema: './drizzle/schema.ts',\n    dialect: 'postgresql',\n    strict: true,\n    dbCredentials: {\n        url: process.env.DATABASE_URL!,\n    },\n});"
+  },
+  {
+    "objectID": "posts/kuri_2/index.html#database",
+    "href": "posts/kuri_2/index.html#database",
+    "title": "Better Auth with React Native",
+    "section": "5. Database",
+    "text": "5. Database\nCreate a Supabase (or Neon, Postgres) instance to store user/auth data and copy the connection string to .env.\n\n\n.env\n\nBETTER_AUTH_SECRET=yourBetterAuthSecret\nBETTER_AUTH_URL=http://localhost:8081 \nDATABASE_URL=\"postgres://...\"\n\nNote: For local testing with Expo Go you will want to replace the BETTER_AUTH_URL later with your machine’s LAN IP (e.g. http://192.168.1.12:8081)."
+  },
+  {
+    "objectID": "posts/kuri_2/index.html#generate-betterauth-schema-from-your-auth-config",
+    "href": "posts/kuri_2/index.html#generate-betterauth-schema-from-your-auth-config",
+    "title": "Better Auth with React Native",
+    "section": "6. Generate BetterAuth schema from your auth config",
+    "text": "6. Generate BetterAuth schema from your auth config\nIf you keep your BetterAuth config (auth.ts) separate, generate the schema like this (adjust paths to your repo):\nnpx @better-auth/cli generate --output \"./drizzle/schema.ts\" --config \"./lib/auth.ts\"\nThis will create drizzle/schema.ts with the tables BetterAuth expects.\nThen run migrations (using drizzle-kit).\nnpx drizzle-kit migrate"
+  },
+  {
+    "objectID": "posts/kuri_2/index.html#auth-client-important-for-expo-go",
+    "href": "posts/kuri_2/index.html#auth-client-important-for-expo-go",
+    "title": "Better Auth with React Native",
+    "section": "7. Auth client (important for Expo Go)",
+    "text": "7. Auth client (important for Expo Go)\nWhen testing on a phone with Expo Go, localhost in the client code points to the phone, not your dev machine. Use your machine’s LAN IP as the baseURL when developing on a device:\n\n\nlib/auth-client.ts\n\nexport const authClient = createAuthClient({\n    baseURL: 'http://192.168.1.12:8081', // change to your machine's IP for Expo Go\n    // ...other options\n})"
+  },
+  {
+    "objectID": "posts/kuri_2/index.html#drizzle-betterauth-adapter-details",
+    "href": "posts/kuri_2/index.html#drizzle-betterauth-adapter-details",
+    "title": "Better Auth with React Native",
+    "section": "8. Drizzle + BetterAuth adapter details",
+    "text": "8. Drizzle + BetterAuth adapter details\nYou will need to update your trustedOrigins in your auth config file to be used for local testing. Also if you use the Drizzle plugin for BetterAuth, the plugin might not automatically pick up the schema. Provide it explicitly and pass the correct db object:\n\n\nlib/auth.ts\n\nimport * as schema from '@/drizzle/schema';\nexport const auth = betterAuth({\n    trustedOrigins: ['myApp://', 'http://localhost:8081'], // accounts for call from mobile and localhost web\n    database: drizzleAdapter(db, {\n        schema: schema, // schema explicitly stated\n    }),\n    ...\n})"
+  },
+  {
+    "objectID": "posts/kuri_2/index.html#the-basic-auth-components",
+    "href": "posts/kuri_2/index.html#the-basic-auth-components",
+    "title": "Better Auth with React Native",
+    "section": "9. The basic auth components",
+    "text": "9. The basic auth components\nAdd your basic sign-in, sign-up, sign-out components from BetterAuth usage"
+  },
+  {
     "objectID": "index.html",
     "href": "index.html",
     "title": "Blog",
     "section": "",
-    "text": "Kuri Origins\n\n\n\n\n\n\nKuri\n\n\n\n\n\n\n\n\n\nOct 4, 2025\n\n\nShivvanandh Mohan\n\n\n\n\n\n\n\n\n\n\n\n\nWelcome To My Blog\n\n\n\n\n\n\nnews\n\n\n\n\n\n\n\n\n\nMar 1, 2025\n\n\nShivvanandh Mohan\n\n\n\n\n\n\nNo matching items"
+    "text": "Better Auth with React Native\n\n\n\n\n\n\nKuri\n\n\n\n\n\n\n\n\n\nOct 7, 2025\n\n\nShivvanandh Mohan\n\n\n\n\n\n\n\n\n\n\n\n\nKuri Origins\n\n\n\n\n\n\nKuri\n\n\n\n\n\n\n\n\n\nOct 4, 2025\n\n\nShivvanandh Mohan\n\n\n\n\n\n\n\n\n\n\n\n\nWelcome To My Blog\n\n\n\n\n\n\nnews\n\n\n\n\n\n\n\n\n\nMar 1, 2025\n\n\nShivvanandh Mohan\n\n\n\n\n\n\nNo matching items"
   },
   {
     "objectID": "posts/kuri_1/index.html",

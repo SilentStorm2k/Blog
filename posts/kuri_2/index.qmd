@@ -1,0 +1,188 @@
+---
+title: "Better Auth with React Native"
+author: "Shivvanandh Mohan"
+date: "10-07-2025"
+format: html
+categories: [Kuri]
+---
+
+# TL;DR
+
+This post documents how to use BetterAuth inside an Expo app. I cover the high-level steps, configuration snippets, migration pitfalls I ran into (Drizzle, Expo, local testing), and the fixes that worked for me.
+
+# Problem 
+
+I wanted a robust, extensible authentication system for **Kuri** that I can later expand to MFA, payment portals, etc. I previously used [Clerk](https://clerk.com) (great UX) but it becomes expensive as users grow and felt restrictive for self-hosting. I decided to try [**BetterAuth**](https://www.better-auth.com/) — it's open-source, self-hostable, and gives me full control.
+
+The main migration challenge was that my project was already wired to a custom auth layer built on Supabase. In addition, a few parts of BetterAuth's Drizzle integration docs were slightly out of date which caused friction. The good news: I got a working basic auth flow and documented the key pitfalls so you don't repeat my mistakes.
+
+
+Also some of the documentation provided by BetterAuth (for storing in database) atleast while using DrizzleORM with their drizzle plugin was slightly outdated and that caused some issue with my code, but I am happy to say that I successfully managed to have a very basic Auth flow using BetterAuth.
+
+# Goals
+
+- Implement a working sign-up / sign-in / sign-out flow with BetterAuth in an Expo app.
+- Keep the setup self-hostable and testable on a physical device (Expo Go).
+- Use Drizzle ORM for database migrations and keep the schema compatible with BetterAuth.
+
+# Why BetterAuth
+
+- Open-source and self-hostable
+- Easy to extend and inspect (MFA, custom flows)
+- Lightweight compared to managed SaaS for early stages
+- Excellent 3rd party plugins with Stripe and Polar
+
+# High-level approach
+
+1. Host BetterAuth instance inside the Expo app using API Routes (local dev) or deploy separately for production.
+
+2. Use Drizzle to generate the BetterAuth schema and push migrations to the database (Supabase/Neon).
+
+3. Create an authClient in the app that points to the BetterAuth backend.
+
+4. Handle local-device testing by using the machine's LAN IP as the baseURL for Expo Go.
+
+# Step-by-step (detailed)
+
+## 1. Follow the BetterAuth + Expo integration docs
+
+I mainly followed the [Expo Integration guide](https://www.better-auth.com/docs/integrations/expo#expo-client) and the [BetterAuth installation guide](https://www.better-auth.com/docs/installation). The integration uses [Expo Router API routes](https://docs.expo.dev/router/reference/api-routes/) so the backend can be served from inside the Expo project.
+
+**API route file**: place your server route at `app/[...auth]+api.ts` (or whatever route you choose) so the Expo Router can host your BetterAuth instance locally.
+
+## 2. app.json config
+
+Ensure the web output is set to `server` so API routes work correctly in the built app:
+
+```{.ts filename="app.json"}
+{
+    "expo": {
+        ...
+        "web": {
+			"output": "server",
+		},
+    }
+}
+```
+
+## 3. Metro bundler
+
+Create a metro.config.js per the [BetterAuth guide](https://www.better-auth.com/docs/integrations/expo#configure-metro-bundler) (see their step about bundler configuration). This helps Metro resolve worker code and native modules the integration expects.
+
+## 4. Drizzle config
+
+Create a `drizzle.config.ts` suited to your folders (adjust out and schema to your repo layout):
+
+
+```{.ts filename="drizzle.config.ts"}
+import { defineConfig } from 'drizzle-kit';
+
+export default defineConfig({
+    out: './drizzle/migrations',
+    schema: './drizzle/schema.ts',
+    dialect: 'postgresql',
+    strict: true,
+    dbCredentials: {
+        url: process.env.DATABASE_URL!,
+    },
+});
+```
+
+## 5. Database
+
+Create a Supabase (or Neon, Postgres) instance to store user/auth data and copy the connection string to .env.
+
+```{filename=".env"}
+BETTER_AUTH_SECRET=yourBetterAuthSecret
+BETTER_AUTH_URL=http://localhost:8081 
+DATABASE_URL="postgres://..."
+```
+
+*Note*: For local testing with Expo Go you will want to replace the BETTER_AUTH_URL later with your machine's LAN IP (e.g. http://192.168.1.12:8081).
+
+## 6. Generate BetterAuth schema from your auth config
+
+If you keep your BetterAuth config (auth.ts) separate, generate the schema like this (adjust paths to your repo):
+
+```{.sh}
+npx @better-auth/cli generate --output "./drizzle/schema.ts" --config "./lib/auth.ts"
+```
+
+This will create `drizzle/schema.ts` with the tables BetterAuth expects.
+
+Then run migrations (using drizzle-kit).
+```{.sh}
+npx drizzle-kit migrate
+```
+
+## 7. Auth client (important for Expo Go)
+
+When testing on a phone with Expo Go, `localhost` in the client code points to the phone, not your dev machine. Use your machine's LAN IP as the `baseURL` when developing on a device:
+
+```{.ts filename="lib/auth-client.ts"}
+export const authClient = createAuthClient({
+    baseURL: 'http://192.168.1.12:8081', // change to your machine's IP for Expo Go
+    // ...other options
+})
+```
+## 8. Drizzle + BetterAuth adapter details
+
+You will need to update your `trustedOrigins` in your auth config file to be used for local testing.
+Also if you use the Drizzle plugin for BetterAuth, the plugin might not automatically pick up the schema. Provide it explicitly and pass the correct `db` object:
+
+
+```{.ts filename="lib/auth.ts"}
+import * as schema from '@/drizzle/schema';
+export const auth = betterAuth({
+    trustedOrigins: ['myApp://', 'http://localhost:8081'], // accounts for call from mobile and localhost web
+    database: drizzleAdapter(db, {
+        schema: schema, // schema explicitly stated
+    }),
+    ...
+})
+```
+
+## 9. The basic auth components
+
+Add your basic sign-in, sign-up, sign-out components from [BetterAuth usage](https://www.better-auth.com/docs/integrations/expo#usage)
+
+# Pitfalls and fixes (summary)
+
+- Docs mismatch: Some examples in the BetterAuth + Drizzle docs were outdated — explicitly pass the schema to the drizzle adapter.
+- Expo Go localhost issue: Always use your dev machine's LAN IP as baseURL while testing on a phone.
+- Trusted origins: Add both the app scheme and local HTTP origin to trustedOrigins for local testing.
+- Migrations: Make sure npx @better-auth/cli generate points to the file where your betterAuth() config lives.
+
+
+One other pitfall is if you use the [SupaBase guide with Drizzle](https://supabase.com/docs/guides/database/drizzle)
+
+In the 3rd step, whenever you are connect to the database using drizzle, 'client' is not correctly destructured. You will need to make the following change wherever your are calling db. For me this was in `drizzle/db.ts`. For you it could be in `index.ts` or wherever you call `db = drizzle()`.
+```{.ts}
+const connectionString = process.env.DATABASE_URL!;
+const client = postgres(connectionString, { prepare: false });
+export const db = drizzle(client);     // WRONG
+export const db = drizzle({ client }); // CORRECT
+```
+
+# Troubleshooting checklist
+
+- Verify `.env` variables are loaded in the process hosting BetterAuth.
+
+- Confirm the generated `drizzle/schema.ts` contains the auth tables.
+
+- Keep your packages up to date. Use tools like `npx expo-doctor` to check your expo version.
+
+
+# Conclusion 
+
+The migration to BetterAuth required a few manual fixes but gave me a self-hostable, extensible auth system I can control and extend.
+
+It overall took me about 2 hours to do all this, cross referencing all the documentation without any prior experience with BetterAuth. The setup is definitely easy but be mindful of them quirks (all these youtube videos with people migrating to BetterAuth in like 5 mins have me reeling :/ ). 
+
+# Next steps
+
+At least when it comes to auth features
+
+- Write out cleaner components for sign-in, sign-up which properly redirect to a designated `home` page.
+- Add MFA and other social logins (very easy with BetterAuth plugins)
+- Add the stripe plugin for payments
